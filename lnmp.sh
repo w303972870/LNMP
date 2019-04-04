@@ -10,7 +10,7 @@ MYSQL_ROOT_PATH="/data/mariadb/"
 
 
 yum install epel-release -y && yum update -y && yum -y groupinstall Development tools
-yum -y install libcurl-devel libXpm-devel perl perl-devel libaio libaio-devel perl-DBD-MySQL which bison kernel-devel openssl-devel perl-Time-HiRes perl-Digest-MD5 libev-devel numactl-libs openssl libxml2-devel gcc-c++ lsof  rsync socat nc boost-program-options ncurses-devel cmake gcc g++ make iproute ncompress glibc-devel glibc-utils glibc blis-threads openblas-threads openblas-threads64 python2-bz2file postgresql-libs unixODBC gd jpeginfo openjpeg openjpeg-devel  libwebp libwebp-devel perl-Image-Xpm libXpm icu libicu libicu-devel libxml++ libxml++-devel libxml++-doc libxml2 bzip2-devel libdb4-devel libdb4* enchant-devel gmp-devel libc-client-devel php-imap  openldap-devel unixODBC-devel freetds-devel libpqxx-devel php-pspell libedit-devel  recode-devel net-snmp-devel libsodium-devel libtidy-devel libxslt-devel libzip-devel pcre pcre2 pcre-devel pcre2-devel  pcre2* pcre* memcached-devel memcached mlocate libmemcached GeoIP-devel zlib-devel perl-ExtUtils-Embed libatomic_ops-devel
+yum -y install libcurl-devel libXpm-devel perl perl-devel libaio libaio-devel perl-DBD-MySQL which bison kernel-devel libjpeg-devel openssl-devel perl-Time-HiRes perl-Digest-MD5 libev-devel numactl-libs openssl libxml2-devel gcc-c++ lsof  rsync socat nc boost-program-options ncurses-devel cmake gcc g++ make iproute ncompress glibc-devel glibc-utils glibc blis-threads openblas-threads openblas-threads64 python2-bz2file postgresql-libs unixODBC gd jpeginfo openjpeg openjpeg-devel  libwebp libwebp-devel perl-Image-Xpm libXpm icu libicu libicu-devel libxml++ libxml++-devel libxml++-doc libxml2 bzip2-devel libdb4-devel libdb4* enchant-devel gmp-devel libc-client-devel php-imap  openldap-devel unixODBC-devel freetds-devel libpqxx-devel php-pspell libedit-devel  recode-devel net-snmp-devel libsodium-devel libtidy-devel libxslt-devel libzip-devel pcre pcre2 pcre-devel pcre2-devel  pcre2* pcre* memcached-devel memcached mlocate libmemcached GeoIP-devel zlib-devel perl-ExtUtils-Embed libatomic_ops-devel
 
 mkdir -p ${PHP_ROOT_PATH}/etc/php-fpm.d/
 mkdir -p ${PHP_ROOT_PATH}/{tmp,logs,session}/
@@ -36,14 +36,23 @@ TMP_SOFT_DIR="/usr/src/"
 mkdir -p $TMP_SOFT_DIR && cd $TMP_SOFT_DIR
 
 curl "https://mirrors.tuna.tsinghua.edu.cn/mariadb//mariadb-${MYSQL_VERSION}/source/mariadb-${MYSQL_VERSION}.tar.gz" -o mariadb-${MYSQL_VERSION}.tar.gz
-curl "http://cn2.php.net/get/php-$PHP_VERSION.tar.gz/from/this/mirror" -o php-$PHP_VERSION.tar.gz
 curl "https://openresty.org/download/openresty-$NGINX_VERSION.tar.gz" -o openresty-$NGINX_VERSION.tar.gz
 curl "ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre2-10.32.tar.gz" -o pcre2-10.32.tar.gz
-curl "https://nih.at/libzip/libzip-1.2.0.tar.gz" -o libzip-1.2.0.tar.gz
+wget https://nih.at/libzip/libzip-1.2.0.tar.gz
+wget https://www.php.net/distributions/php-$PHP_VERSION.tar.gz
 
-tar zxf pcre2-10.32.tar.gz && cd pcre2-10.32 && ./configure && make && make install && cd ..
+tar zxf pcre2-10.32.tar.gz
+cd pcre2-10.32 
+./configure
+make && make install 
+cd ..
+
 yum remove libzip*
-tar zxf libzip-1.2.0.tar.gz  && cd libzip-1.2.0 && ./configure && make && make install && cd ..
+tar zxf libzip-1.2.0.tar.gz  
+cd libzip-1.2.0 
+./configure 
+make && make install 
+cd ..
 
 DATA_DIR=$MYSQL_ROOT_PATH/database/ 
 LOGS_DIR=$MYSQL_ROOT_PATH/logs/ 
@@ -317,10 +326,10 @@ tar zxf php-$PHP_VERSION.tar.gz && cd php-$PHP_VERSION
  --with-xsl \
  --enable-zip \
  --with-libzip \
- --with-zlib \ 
+ --with-zlib  \
  --with-zlib-dir \
  --disable-phpdbg \
- --enable-fpm \ 
+ --enable-fpm  \
  --enable-embed \
  --with-fpm-user=nginx \
  --with-fpm-group=nginx \
@@ -332,48 +341,57 @@ tar zxf php-$PHP_VERSION.tar.gz && cd php-$PHP_VERSION
  --enable-shared \
  --with-litespeed
 
-make && make test && make install && cd $TMP_SOFT_DIR
+make && make test && make install 
+cd $TMP_SOFT_DIR
 
 git clone https://github.com/phpredis/phpredis.git
 cd phpredis/
 /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config 
-make && make test && make install && cd $TMP_SOFT_DIR
+make && make test && make install 
+cd $TMP_SOFT_DIR
 
 git clone https://github.com/php-memcached-dev/php-memcached.git
 cd php-memcached/ && /usr/local/php/bin/phpize 
 wget https://launchpad.net/libmemcached/1.0/1.0.18/+download/libmemcached-1.0.18.tar.gz
 tar zxf libmemcached-1.0.18.tar.gz && cd libmemcached-1.0.18 && ./configure --prefix=/usr/local/libmemcached && make && make install && cd ..
 ./configure --with-php-config=/usr/local/php/bin/php-config --with-libmemcached-dir=/usr/local/libmemcached
-make && make install && cd $TMP_SOFT_DIR
+make && make install 
+cd $TMP_SOFT_DIR
 
 wget http://pecl.php.net/get/mongodb-1.6.0alpha1.tgz
 tar zxf mongodb-1.6.0alpha1.tgz && cd mongodb-1.6.0alpha1
 /usr/local/php/bin/phpize 
 ./configure --with-php-config=/usr/local/php/bin/php-config 
-make && make test && make install && cd $TMP_SOFT_DIR
+make && make test && make install 
+cd $TMP_SOFT_DIR
 
 wget https://imagemagick.org/download/ImageMagick.tar.gz
 tar zxf ImageMagick.tar.gz  && cd `ls | grep ImageMagick | grep -v ImageMagick.tar.gz`
-./configure && make && make install && cd $TMP_SOFT_DIR
+./configure && make && make install 
+cd $TMP_SOFT_DIR
 
 wget http://pecl.php.net/get/imagick-3.4.3.tgz
 tar zxf imagick-3.4.3.tgz && cd imagick-3.4.3 && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config 
-make && make install && cd $TMP_SOFT_DIR
+make && make install
+cd $TMP_SOFT_DIR
 
-git clone https://github.com/jonnywang/jz.git && cd jz/
-/usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config 
-make && make test && make install && cd $TMP_SOFT_DIR
+git clone https://github.com/jonnywang/jz.git 
+cd jz/ && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config 
+make && make test && make install 
+cd $TMP_SOFT_DIR
 
 mkdir -p /data/jieba/dict
-git clone https://github.com/jonnywang/phpjieba.git && cd phpjieba/cjieba/ && cp dict/* /data/jieba/dict/
-/usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config 
-make && make test && make install && cd $TMP_SOFT_DIR
+git clone https://github.com/jonnywang/phpjieba.git 
+cd phpjieba/cjieba/ && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config 
+make && make test && make install  && cp dict/* /data/jieba/dict/ 
+cd $TMP_SOFT_DIR
 
 mkdir -p /data/scws/etc
 wget http://www.xunsearch.com/scws/down/scws-1.2.3.tar.bz2 && tar jxf scws-1.2.3.tar.bz2 && cd scws-1.2.3
 ./configure --sysconfdir=/data/scws/etc && make && make install
 cd phpext/ && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config 
-make && make test && make install && cd $TMP_SOFT_DIR
+make && make test && make install 
+cd $TMP_SOFT_DIR
 
 PHP_INI=<<PHPINI
  [PHP]
@@ -740,7 +758,7 @@ NGINX_CONF_WEB=<<NGINXCONFWEB
          deny all;
      }
  }
-<<NGINXCONFWEB
+NGINXCONFWEB
 echo $NGINX_CONF_WEB > ${NGINX_ROOT_PATH}/conf/conf.d/web.conf
 /usr/local/nginx/sbin/nginx
 echo "/usr/local/nginx/sbin/nginx" >> /etc/rc.local
