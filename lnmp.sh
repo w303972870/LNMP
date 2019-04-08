@@ -10,7 +10,7 @@ MYSQL_ROOT_PATH="/data/mariadb/"
 
 
 yum install epel-release -y && yum update -y && yum -y groupinstall Development tools
-yum -y install libcurl-devel libXpm-devel perl perl-devel libaio libaio-devel perl-DBD-MySQL which bison kernel-devel libjpeg-devel openssl-devel perl-Time-HiRes perl-Digest-MD5 libev-devel numactl-libs openssl libxml2-devel gcc-c++ lsof  rsync socat nc boost-program-options ncurses-devel cmake gcc g++ make iproute ncompress glibc-devel glibc-utils glibc blis-threads openblas-threads openblas-threads64 python2-bz2file postgresql-libs unixODBC gd jpeginfo openjpeg openjpeg-devel  libwebp libwebp-devel perl-Image-Xpm libXpm icu libicu libicu-devel libxml++ libxml++-devel libxml++-doc libxml2 libpng-devel bzip2-devel libdb4-devel libdb4* enchant-devel gmp-devel libc-client-devel php-imap  openldap-devel unixODBC-devel freetds-devel libpqxx-devel aspell-devel libedit-devel  recode-devel net-snmp-devel freetype-devel libsodium-devel libtidy-devel libxslt-devel libzip-devel pcre pcre2 pcre-devel pcre2-devel  pcre2* pcre* memcached-devel memcached mlocate libmemcached GeoIP-devel zlib-devel perl-ExtUtils-Embed libatomic_ops-devel
+yum -y install libcurl-devel libXpm-devel perl perl-devel libaio libaio-devel perl-DBD-MySQL which bison kernel-devel libjpeg-devel openssl-devel perl-Time-HiRes perl-Digest-MD5 libev-devel numactl-libs openssl libxml2-devel gcc-c++ lsof  rsync socat nc boost-program-options ncurses-devel cmake gcc g++ make iproute ncompress glibc-devel glibc-utils glibc blis-threads openblas-threads openblas-threads64 python2-bz2file postgresql-libs unixODBC gd jpeginfo openjpeg openjpeg-devel  libwebp libwebp-devel perl-Image-Xpm libXpm icu libicu libicu-devel libxml++ libxml++-devel libxml++-doc libxml2 libpng-devel bzip2-devel libdb4-devel libdb4* enchant-devel gmp-devel libc-client-devel php-imap  openldap-devel unixODBC-devel freetds-devel libpqxx-devel aspell-devel libedit-devel  recode-devel net-snmp-devel freetype-devel libsodium-devel libtidy-devel libxslt-devel pcre pcre2 pcre-devel pcre2-devel  pcre2* pcre* memcached-devel memcached mlocate libmemcached GeoIP-devel zlib-devel perl-ExtUtils-Embed libatomic_ops-devel
 
 mkdir -p ${PHP_ROOT_PATH}/etc/php-fpm.d/
 mkdir -p ${PHP_ROOT_PATH}/{tmp,logs,session}/
@@ -47,11 +47,13 @@ cd pcre2-10.32
 make && make install 
 cd ..
 
-yum remove libzip*  -y 
+yum remove libzip* -y 
+rm -f /usr/local/lib/libzip*
 tar zxf libzip-1.2.0.tar.gz  
 cd libzip-1.2.0 
 ./configure 
 make && make install 
+ln -s /usr/local/lib/libzip/include/zipconf.h /usr/local/include/zipconf.h
 cd ..
 
 DATA_DIR=$MYSQL_ROOT_PATH/database/ 
