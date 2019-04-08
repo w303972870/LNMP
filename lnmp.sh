@@ -8,9 +8,13 @@ NGINX_ROOT_PATH="/data/nginx/"
 MYSQL_VERSION="10.3.13"
 MYSQL_ROOT_PATH="/data/mariadb/"
 
+TMP_SOFT_DIR="/usr/src/"
+mkdir -p $TMP_SOFT_DIR
+cd $TMP_SOFT_DIR
+rm -rf $TMP_SOFT_DIR/*
 
 yum install epel-release -y && yum update -y && yum -y groupinstall Development tools
-yum -y install libcurl-devel libXpm-devel perl perl-devel libaio libaio-devel perl-DBD-MySQL which bison kernel-devel libjpeg-devel openssl-devel perl-Time-HiRes perl-Digest-MD5 libev-devel numactl-libs openssl libxml2-devel gcc-c++ lsof  rsync socat nc boost-program-options ncurses-devel cmake gcc g++ make iproute ncompress glibc-devel glibc-utils glibc blis-threads openblas-threads openblas-threads64 python2-bz2file postgresql-libs unixODBC gd jpeginfo openjpeg openjpeg-devel  libwebp libwebp-devel perl-Image-Xpm libXpm icu libicu libicu-devel libxml++ libxml++-devel libxml++-doc libxml2 libpng-devel bzip2-devel libdb4-devel libdb4* enchant-devel gmp-devel libc-client-devel php-imap  openldap-devel unixODBC-devel freetds-devel libpqxx-devel aspell-devel libedit-devel  recode-devel net-snmp-devel freetype-devel libsodium-devel libtidy-devel libxslt-devel pcre pcre2 pcre-devel pcre2-devel  pcre2* pcre* memcached-devel memcached mlocate libmemcached GeoIP-devel zlib-devel perl-ExtUtils-Embed libatomic_ops-devel
+yum -y install libcurl-devel libXpm-devel perl perl-devel libaio libaio-devel perl-DBD-MySQL which bison kernel-devel libjpeg-devel openssl-devel perl-Time-HiRes perl-Digest-MD5 libev-devel numactl-libs openssl libxml2-devel gcc-c++ lsof  rsync socat nc boost-program-options ncurses-devel cmake gcc g++ make iproute ncompress glibc-devel glibc-utils glibc blis-threads openblas-threads openblas-threads64 python2-bz2file postgresql-libs unixODBC gd gd-devel jpeginfo openjpeg openjpeg-devel  libwebp libwebp-devel perl-Image-Xpm libXpm icu libicu libicu-devel libxml++ libxml++-devel libxml++-doc libxml2 libpng-devel bzip2-devel libdb4-devel libdb4* enchant-devel gmp-devel libc-client-devel php-imap  openldap-devel unixODBC-devel freetds-devel libpqxx-devel aspell-devel libedit-devel  recode-devel net-snmp-devel freetype-devel libsodium-devel libtidy-devel libxslt-devel pcre pcre2 pcre-devel pcre2-devel  pcre2* pcre* memcached-devel memcached mlocate libmemcached GeoIP-devel zlib-devel perl-ExtUtils-Embed libatomic_ops-devel
 
 mkdir -p ${PHP_ROOT_PATH}/etc/php-fpm.d/
 mkdir -p ${PHP_ROOT_PATH}/{tmp,logs,session}/
@@ -31,9 +35,6 @@ ln -s /usr/lib64/libsybdb.so /usr/lib/
 ln -s /usr/lib64/liblber* /usr/lib/
 
 echo "LANG=\"zh_CN\"" > /etc/locale.conf && source /etc/locale.conf
-
-TMP_SOFT_DIR="/usr/src/"
-mkdir -p $TMP_SOFT_DIR && cd $TMP_SOFT_DIR
 
 curl "https://mirrors.tuna.tsinghua.edu.cn/mariadb//mariadb-${MYSQL_VERSION}/source/mariadb-${MYSQL_VERSION}.tar.gz" -o mariadb-${MYSQL_VERSION}.tar.gz
 curl "https://openresty.org/download/openresty-$NGINX_VERSION.tar.gz" -o openresty-$NGINX_VERSION.tar.gz
@@ -246,6 +247,7 @@ echo $MYSQL_ETC_CONF > $ETC_DIR/my.cnf
 
 echo "/usr/local/mysql/bin/mysqld_safe --defaults-file=$ETC_DIR/my.cnf --user=mysql --datadir=$DATA_DIR --skip-name-resolve --basedir=/usr/local/mysql/ --skip-networking --nowatch" >> /etc/rc.local
 
+cd $TMP_SOFT_DIR
 tar zxf php-$PHP_VERSION.tar.gz && cd php-$PHP_VERSION
 ./configure --prefix=/usr/local/php/ \
  --with-pic \
@@ -343,13 +345,13 @@ tar zxf php-$PHP_VERSION.tar.gz && cd php-$PHP_VERSION
  --enable-shared \
  --with-litespeed
 
-make && make test && make install 
+make && make install 
 cd $TMP_SOFT_DIR
 
 git clone https://github.com/phpredis/phpredis.git
 cd phpredis/
 /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config 
-make && make test && make install 
+make  && make install 
 cd $TMP_SOFT_DIR
 
 git clone https://github.com/php-memcached-dev/php-memcached.git
@@ -364,7 +366,7 @@ wget http://pecl.php.net/get/mongodb-1.6.0alpha1.tgz
 tar zxf mongodb-1.6.0alpha1.tgz && cd mongodb-1.6.0alpha1
 /usr/local/php/bin/phpize 
 ./configure --with-php-config=/usr/local/php/bin/php-config 
-make && make test && make install 
+make  && make install 
 cd $TMP_SOFT_DIR
 
 wget https://imagemagick.org/download/ImageMagick.tar.gz
@@ -379,20 +381,20 @@ cd $TMP_SOFT_DIR
 
 git clone https://github.com/jonnywang/jz.git 
 cd jz/ && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config 
-make && make test && make install 
+make  && make install 
 cd $TMP_SOFT_DIR
 
 mkdir -p /data/jieba/dict
 git clone https://github.com/jonnywang/phpjieba.git 
 cd phpjieba/cjieba/ && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config 
-make && make test && make install  && cp dict/* /data/jieba/dict/ 
+make  && make install  && cp dict/* /data/jieba/dict/ 
 cd $TMP_SOFT_DIR
 
 mkdir -p /data/scws/etc
 wget http://www.xunsearch.com/scws/down/scws-1.2.3.tar.bz2 && tar jxf scws-1.2.3.tar.bz2 && cd scws-1.2.3
 ./configure --sysconfdir=/data/scws/etc && make && make install
 cd phpext/ && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config 
-make && make test && make install 
+make  && make install 
 cd $TMP_SOFT_DIR
 
 PHP_INI=<<PHPINI
@@ -596,7 +598,8 @@ tar -zxf openresty-$NGINX_VERSION.tar.gz && cd openresty-$NGINX_VERSION
 curl "http://labs.frickle.com/files/ngx_cache_purge-2.3.tar.gz" -o bundle/ngx_cache_purge-2.3.tar.gz
 wget https://github.com/yaoweibin/nginx_upstream_check_module/archive/v0.3.0.tar.gz -O bundle/v0.3.0.tar.gz 
 git clone git://github.com/aszxqw/ngx_http_cppjieba_module.git bundle/ngx_http_cppjieba_module/
-tar -zxf bundle/ngx_cache_purge-2.3.tar.gz -C bundle/ && tar -zxf bundle/v0.3.0.tar.gz -C bundle/
+tar zxf bundle/ngx_cache_purge-2.3.tar.gz -C bundle/ 
+tar zxf bundle/v0.3.0.tar.gz -C bundle/
 ./configure --prefix=/usr/local/nginx/ \
  --sbin-path=/usr/local/nginx/sbin/nginx \
  --conf-path=${NGINX_ROOT_PATH}/conf/nginx.conf \
@@ -650,9 +653,9 @@ tar -zxf bundle/ngx_cache_purge-2.3.tar.gz -C bundle/ && tar -zxf bundle/v0.3.0.
  --without-mail_imap_module \
  --without-mail_pop3_module \
  --without-mail_smtp_module \
- --add-module=/usr/src/openresty-$OPENRESTY_VERSION/bundle/ngx_cache_purge-2.3 \
- --add-module=/usr/src/openresty-$OPENRESTY_VERSION/bundle/nginx_upstream_check_module-0.3.0 \
- --add-module=/usr/src/openresty-$OPENRESTY_VERSION/bundle/ngx_http_cppjieba_module/src
+ --add-module=/usr/src/openresty-$NGINX_VERSION/bundle/ngx_cache_purge-2.3 \
+ --add-module=/usr/src/openresty-$NGINX_VERSION/bundle/nginx_upstream_check_module-0.3.0 \
+ --add-module=/usr/src/openresty-$NGINX_VERSION/bundle/ngx_http_cppjieba_module/src
 gmake && gmake install && cd $TMP_SOFT_DIR
 
 NGINX_CONF=<<NGNIXCONF
