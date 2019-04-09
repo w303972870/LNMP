@@ -379,15 +379,13 @@ tar zxf imagick-3.4.3.tgz && cd imagick-3.4.3 && /usr/local/php/bin/phpize && ./
 make && make install
 cd $TMP_SOFT_DIR
 
-git clone https://github.com/jonnywang/jz.git 
-cd jz/ && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config 
-make  && make install 
-cd $TMP_SOFT_DIR
-
 mkdir -p /data/jieba/dict
 git clone https://github.com/jonnywang/phpjieba.git 
-cd phpjieba/cjieba/ && /usr/local/php/bin/phpize && ./configure --with-php-config=/usr/local/php/bin/php-config 
-make  && make install  && cp dict/* /data/jieba/dict/ 
+cd phpjieba/
+/usr/local/php/bin/phpize
+./configure --with-php-config=/usr/local/php/bin/php-config 
+make  && make install
+cp dict/* /data/jieba/dict/ 
 cd $TMP_SOFT_DIR
 
 mkdir -p /data/scws/etc
@@ -450,7 +448,6 @@ PHP_INI=<<PHPINI
  jieba.dict_path=/data/jieba/dict
  
  extension=/usr/local/php/lib/php/extensions/no-debug-non-zts-20180731/imagick.so
- extension=/usr/local/php/lib/php/extensions/no-debug-non-zts-20180731/jz.so
  extension=/usr/local/php/lib/php/extensions/no-debug-non-zts-20180731/memcached.so
  extension=/usr/local/php/lib/php/extensions/no-debug-non-zts-20180731/mongodb.so
  extension=/usr/local/php/lib/php/extensions/no-debug-non-zts-20180731/redis.so
