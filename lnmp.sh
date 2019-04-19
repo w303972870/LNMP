@@ -388,7 +388,7 @@ cd cjieba
 make
 cd ..
 make  && make install
-cp dict/* /data/jieba/dict/ 
+cp cjieba/dict/* /data/jieba/dict/ 
 cd $TMP_SOFT_DIR
 
 mkdir -p /data/scws/etc
