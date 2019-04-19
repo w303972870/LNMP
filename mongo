@@ -1,0 +1,358 @@
+rm -rf /data/mongodb/arbiter{1,2,3,4,5,6}/{data,logs}/*
+rm -rf /data/mongodb/{mongos,mongoconf}/{data,logs}/*
+rm -rf /data/mongodb/shard{1,2,3,4,5,6}/{data,logs}/*
+
+
+
+ps aux | grep mongo | awk '{print $2}'|xargs kill -9
+
+/usr/bin/mongod -f /data/mongodb/arbiter1/conf/mongod.arbiter1.conf 
+/usr/bin/mongod -f /data/mongodb/arbiter2/conf/mongod.arbiter2.conf 
+/usr/bin/mongod -f /data/mongodb/arbiter3/conf/mongod.arbiter3.conf 
+/usr/bin/mongod -f /data/mongodb/arbiter4/conf/mongod.arbiter4.conf 
+/usr/bin/mongod -f /data/mongodb/arbiter5/conf/mongod.arbiter5.conf 
+/usr/bin/mongod -f /data/mongodb/arbiter6/conf/mongod.arbiter6.conf 
+
+
+
+/usr/bin/mongod -f /data/mongodb/mongoconf/conf/mongod.conf.conf
+
+mongo 192.168.12.2:23001
+
+config = {
+    _id : "node_conf",
+    members : [
+         {_id : 0, host : "192.168.12.2:23001", priority : 3 },
+         {_id : 1, host : "192.168.12.3:23001", priority : 2 },
+         {_id : 2, host : "192.168.12.4:23001", priority : 1 },
+     ]
+ }
+
+rs.initiate(config)
+
+
+use admin
+
+db.createUser({user:"admin",pwd:"123456",roles:["userAdminAnyDatabase","dbAdminAnyDatabase" ]});  
+db.createUser({user:"root",pwd:"5efb20a87beee3193d502d7a68779f07",roles:["root"]});  
+
+db.grantRolesToUser(
+    "root",
+    [
+      { role: "root", db: "admin" }
+    ]
+)
+
+
+db.createUser(
+    {
+        user:"wangdianchen",
+        pwd:"5efb20a87beee3193d502d7a68779f07",
+        roles:[{role:"root",db:"admin"}]
+    }
+)
+
+
+
+
+rs.remove("192.168.12.3:23001")
+rs.add("192.168.12.3:23001")
+
+
+/usr/bin/mongod -f /data/mongodb/shard1/conf/mongod.shard1.conf
+
+mongo 192.168.12.2:23100
+
+use admin
+config = {
+    _id : "node_shard1",
+    members : [
+         {_id : 0, host : "192.168.12.2:23100", priority : 3 },
+         {_id : 1, host : "192.168.12.3:23101", priority : 2 },
+         {_id : 2, host : "192.168.12.4:23102", priority : 1 },
+         {_id : 3, host : "192.168.12.10:24001", arbiterOnly :true },
+     ]
+ }
+
+
+rs.initiate(config)
+use admin
+
+db.createUser({user:"admin",pwd:"123456",roles:["userAdminAnyDatabase","dbAdminAnyDatabase" ]});  
+db.createUser({user:"root",pwd:"5efb20a87beee3193d502d7a68779f07",roles:["root"]});  
+
+db.grantRolesToUser(
+    "root",
+    [
+      { role: "root", db: "admin" }
+    ]
+)
+
+
+db.createUser(
+    {
+        user:"wangdianchen",
+        pwd:"5efb20a87beee3193d502d7a68779f07",
+        roles:[{role:"root",db:"admin"}]
+    }
+)
+
+
+
+/usr/bin/mongod -f /data/mongodb/shard2/conf/mongod.shard2.conf
+
+mongo 192.168.12.3:23200
+use admin
+config = {
+    _id : "node_shard2",
+    members : [
+         {_id : 0, host : "192.168.12.2:23201", priority : 2 },
+         {_id : 1, host : "192.168.12.3:23200", priority : 3 },
+         {_id : 2, host : "192.168.12.4:23202", priority : 1 },
+         {_id : 3, host : "192.168.12.10:24002" , arbiterOnly :true },
+     ]
+ }
+
+rs.initiate(config)
+use admin
+
+db.createUser({user:"admin",pwd:"123456",roles:["userAdminAnyDatabase","dbAdminAnyDatabase" ]});  
+db.createUser({user:"root",pwd:"5efb20a87beee3193d502d7a68779f07",roles:["root"]});  
+
+db.grantRolesToUser(
+    "root",
+    [
+      { role: "root", db: "admin" }
+    ]
+)
+
+
+db.createUser(
+    {
+        user:"wangdianchen",
+        pwd:"5efb20a87beee3193d502d7a68779f07",
+        roles:[{role:"root",db:"admin"}]
+    }
+)
+
+
+/usr/bin/mongod -f /data/mongodb/shard3/conf/mongod.shard3.conf
+
+mongo 192.168.12.4:23300
+
+use admin
+config = {
+    _id : "node_shard3",
+    members : [
+         {_id : 0, host : "192.168.12.2:23301", priority : 1 },
+         {_id : 1, host : "192.168.12.3:23302", priority : 2 },
+         {_id : 2, host : "192.168.12.4:23300", priority : 3 },
+         {_id : 3, host : "192.168.12.10:24003" , arbiterOnly :true },
+     ]
+ }
+
+rs.initiate(config)
+use admin
+
+db.createUser({user:"admin",pwd:"123456",roles:["userAdminAnyDatabase","dbAdminAnyDatabase" ]});  
+db.createUser({user:"root",pwd:"5efb20a87beee3193d502d7a68779f07",roles:["root"]});  
+
+db.grantRolesToUser(
+    "root",
+    [
+      { role: "root", db: "admin" }
+    ]
+)
+
+
+db.createUser(
+    {
+        user:"wangdianchen",
+        pwd:"5efb20a87beee3193d502d7a68779f07",
+        roles:[{role:"root",db:"admin"}]
+    }
+)
+
+
+/usr/bin/mongod -f /data/mongodb/shard4/conf/mongod.shard4.conf
+
+
+mongo 192.168.12.2:23400
+
+use admin
+
+rs.initiate({
+    _id : "node_shard4",
+    members : [
+         {_id : 0, host : "192.168.12.2:23400", priority : 3 },
+         {_id : 1, host : "192.168.12.3:23401", priority : 2 },
+         {_id : 2, host : "192.168.12.4:23402", priority : 1 },
+         {_id : 3, host : "192.168.12.10:24004" , arbiterOnly :true },
+     ]
+ })
+use admin
+
+db.createUser({user:"admin",pwd:"123456",roles:["userAdminAnyDatabase","dbAdminAnyDatabase" ]});  
+db.createUser({user:"root",pwd:"5efb20a87beee3193d502d7a68779f07",roles:["root"]});  
+
+db.grantRolesToUser(
+    "root",
+    [
+      { role: "root", db: "admin" }
+    ]
+)
+
+
+db.createUser(
+    {
+        user:"wangdianchen",
+        pwd:"5efb20a87beee3193d502d7a68779f07",
+        roles:[{role:"root",db:"admin"}]
+    }
+)
+
+/usr/bin/mongod -f /data/mongodb/shard5/conf/mongod.shard5.conf
+
+mongo 192.168.12.3:23500
+
+
+use admin;
+
+rs.initiate({
+    _id : "node_shard5",
+    members : [
+         {_id : 0, host : "192.168.12.2:23501", priority : 1 },
+         {_id : 1, host : "192.168.12.3:23500", priority : 3 },
+         {_id : 2, host : "192.168.12.4:23502", priority : 2 },
+         {_id : 3, host : "192.168.12.10:24005" , arbiterOnly :true },
+     ]
+ })
+use admin
+
+db.createUser({user:"admin",pwd:"123456",roles:["userAdminAnyDatabase","dbAdminAnyDatabase" ]});  
+db.createUser({user:"root",pwd:"5efb20a87beee3193d502d7a68779f07",roles:["root"]});  
+
+db.grantRolesToUser(
+    "root",
+    [
+      { role: "root", db: "admin" }
+    ]
+)
+
+
+db.createUser(
+    {
+        user:"wangdianchen",
+        pwd:"5efb20a87beee3193d502d7a68779f07",
+        roles:[{role:"root",db:"admin"}]
+    }
+)
+
+
+/usr/bin/mongod -f /data/mongodb/shard6/conf/mongod.shard6.conf
+
+mongo 192.168.12.4:23600
+
+use admin;
+
+rs.initiate({
+    _id : "node_shard6",
+    members : [
+         {_id : 0, host : "192.168.12.2:23601", priority : 2 },
+         {_id : 1, host : "192.168.12.3:23602", priority : 1 },
+         {_id : 2, host : "192.168.12.4:23600", priority : 3 },
+         {_id : 3, host : "192.168.12.10:24006" , arbiterOnly :true },
+     ]
+ })
+use admin
+
+db.createUser({user:"admin",pwd:"123456",roles:["userAdminAnyDatabase","dbAdminAnyDatabase" ]});  
+db.createUser({user:"root",pwd:"5efb20a87beee3193d502d7a68779f07",roles:["root"]});  
+
+db.grantRolesToUser(
+    "root",
+    [
+      { role: "root", db: "admin" }
+    ]
+)
+
+
+db.createUser(
+    {
+        user:"wangdianchen",
+        pwd:"5efb20a87beee3193d502d7a68779f07",
+        roles:[{role:"root",db:"admin"}]
+    }
+)
+
+
+
+/usr/bin/mongos -f /data/mongodb/mongos/conf/mongod.mongos.conf
+
+/usr/bin/mongo 192.168.12.2:22001
+use admin
+
+sh.addShard("node_shard1/192.168.12.2:23100,192.168.12.3:23101,192.168.12.4:23102")
+sh.addShard("node_shard2/192.168.12.2:23201,192.168.12.3:23200,192.168.12.4:23202")
+sh.addShard("node_shard3/192.168.12.2:23301,192.168.12.3:23302,192.168.12.4:23300")
+
+sh.addShard("node_shard4/192.168.12.2:23400,192.168.12.3:23401,192.168.12.4:23402")
+sh.addShard("node_shard5/192.168.12.2:23501,192.168.12.3:23500,192.168.12.4:23502")
+sh.addShard("node_shard6/192.168.12.2:23601,192.168.12.3:23602,192.168.12.4:23600")
+
+
+
+use admin
+
+db.createUser({user:"admin",pwd:"123456",roles:["userAdminAnyDatabase","dbAdminAnyDatabase" ]});  
+db.createUser({user:"root",pwd:"5efb20a87beee3193d502d7a68779f07",roles:["root"]});  
+
+db.grantRolesToUser(
+    "root",
+    [
+      { role: "root", db: "admin" }
+    ]
+)
+
+
+db.createUser(
+    {
+        user:"wangdianchen",
+        pwd:"5efb20a87beee3193d502d7a68779f07",
+        roles:[{role:"root",db:"admin"}]
+    }
+)
+
+
+
+db.createUser(
+    {
+        user:"test",
+        pwd:"test",
+        roles:[{role:"dbOwner",db:"test"}]
+    }
+)
+
+
+#关闭服务
+/usr/bin/mongod --shutdown --dbpath /data/mongodb/shard1/data
+/usr/bin/mongod --shutdown --dbpath /data/mongodb/shard2/data
+/usr/bin/mongod --shutdown --dbpath /data/mongodb/shard3/data
+
+
+
+#设置slave可读
+rs.slaveOk()
+
+
+use admin
+#对bike这个数据库开启分片功能
+db.runCommand({"enablesharding":"test"}) 
+
+#对bike数据库下的users集合按id的hash进行分片
+db.runCommand({"shardcollection":"test.users","key":{_id:'hashed'}})
+
+use test
+db.createUser({user: "test",pwd: "test",roles: [ { role: "dbOwner", db: "test" } ]});
+
+
