@@ -384,6 +384,9 @@ git clone https://github.com/jonnywang/phpjieba.git
 cd phpjieba/
 /usr/local/php/bin/phpize
 ./configure --with-php-config=/usr/local/php/bin/php-config 
+cd cjieba
+make
+cd ..
 make  && make install
 cp dict/* /data/jieba/dict/ 
 cd $TMP_SOFT_DIR
